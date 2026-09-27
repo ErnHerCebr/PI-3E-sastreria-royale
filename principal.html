@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sastrería Royale - Panel & Catálogo</title>
+
+    <!-- FontAwesome para Íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (Utilidades) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { 400: '#e5c158', 500: '#d4af37', 600: '#aa8c2c' },
+                        emeraldCustom: { 500: '#0d5c46', 600: '#094736', 700: '#053326' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Estilos Externos Separados -->
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- BARRA NAVEGACIÓN PRINCIPAL (Estilo MarketGo) -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo Sastrería -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('tienda')">
+                <div class="w-10 h-10 rounded-full bg-emeraldCustom-600 text-gold-400 flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-scissors text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-serif-title font-bold text-xl text-gray-900 tracking-wide block">Sastrería Royale</span>
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest block font-semibold">Alta Costura</span>
+                </div>
+            </div>
+
+            <!-- Menú Central Superior -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                <button onclick="showSection('tienda')" class="nav-btn text-gray-700 hover:text-emeraldCustom-600 flex items-center space-x-2 py-2 border-b-2 border-transparent hover:border-emeraldCustom-600 transition">
+                    <i class="fa-solid fa-house text-lg"></i>
+                    <span>Inicio</span>
+                </button>
+                <button onclick="openModal('cartModal')" class="nav-btn text-gray-700 hover:text-emeraldCustom-600 flex items-center space-x-2 py-2 relative transition">
+                    <i class="fa-solid fa-cart-shopping text-lg"></i>
+                    <span>Carrito</span>
+                    <span id="cartBadge" class="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
+                </button>
+                <button onclick="openDashboardModal()" class="nav-btn text-gray-700 hover:text-emeraldCustom-600 flex items-center space-x-2 py-2 transition">
+                    <i class="fa-solid fa-bars text-lg text-amber-500"></i>
+                    <span>Menú / Dashboard</span>
+                </button>
+            </nav>
+
+            <!-- Menú Usuario -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex flex-col text-right">
+                    <span id="userName" class="text-xs font-bold text-gray-800">Usuario</span>
+                    <span id="userEmail" class="text-[11px] text-gray-500">Correo no disponible</span>
+                </div>
+                <button id="themeToggle" type="button" onclick="alternarTema()" title="Activar modo oscuro" aria-label="Activar modo oscuro" class="p-2 text-gray-500 hover:text-amber-600 transition rounded-lg hover:bg-gray-100">
+                    <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <a href="cerrar_sesion.php" onclick="cerrarSesion()" title="Cerrar Sesión" class="p-2 text-gray-500 hover:text-red-600 transition rounded-lg hover:bg-gray-100">
+                    <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- CONTENIDO DINÁMICO -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ================= SECCIÓN 1: TIENDA PRINCIPAL ================= -->
+        <section id="sec-tienda" class="space-y-8">
+            
+            <!-- Hero Banner de Bienvenida -->
+            <div class="hero-banner rounded-2xl shadow-xl flex flex-col justify-center items-center text-center">
+                <span class="text-gold-400 font-semibold uppercase tracking-widest text-xs mb-2">Colección Exclusiva 2026</span>
+                <h1 class="text-3xl sm:text-5xl font-bold font-serif-title mb-3">¡Sastrería Royale te da la Bienvenida!</h1>
+                <p class="text-gray-200 text-sm sm:text-base max-w-2xl mb-6">Explora nuestros trajes confeccionados a mano, telas importadas y accesorios de alta costura diseñados para tu distinción.</p>
+                <button onclick="scrollToProducts()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
+                    Ver Catálogo Disponible
+                </button>
+            </div>
+
+            <!-- Catálogo de Productos (Fiel a la vista de referencia) -->
+            <div id="productos-anchor" class="pt-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-5 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">
+                        <label class="relative block">
+                            <span class="sr-only">Buscar productos</span>
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            <input id="productSearch" type="search" placeholder="Buscar trajes, camisas, sacos..." autocomplete="off" class="w-full border border-gray-300 rounded-xl pl-11 pr-4 py-3 text-sm text-gray-800 focus:ring-amber-500 focus:border-amber-500">
+                        </label>
+                        <label class="flex items-center gap-3 text-sm font-semibold text-gray-700 whitespace-nowrap">
+                            <span>Categoría:</span>
+                            <select id="categoryFilter" class="border border-gray-300 rounded-xl px-4 py-3 font-normal text-gray-800 focus:ring-amber-500 focus:border-amber-500">
+                                <option value="todas">Todas las Categorías</option>
+                                <option value="trajes">Trajes Completos</option>
+                                <option value="sacos">Sacos &amp; Blazers</option>
+                                <option value="camisas">Camisas de Vestir</option>
+                                <option value="accesorios">Accesorios Fina Costura</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-serif-title text-2xl font-bold text-gray-900">Nuestros Productos</h2>
+                    <span id="productCount" class="text-xs font-semibold text-gray-500 bg-gray-200 px-3 py-1 rounded-full">5 productos</span>
+                </div>
+
+                <!-- Rejilla de Productos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    
+                    <!-- Producto 1 -->
+                    <div class="product-card p-4 flex flex-col justify-between" data-category="trajes" data-search="traje ejecutivo marino traje sastre">
+                        <div class="product-image-container mb-3">
+                            <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=400&auto=format&fit=crop" alt="Traje Sastre">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">Traje Ejecutivo Marino</h3>
+                            <p class="text-amber-600 font-bold text-base my-1">$4,500</p>
+                            <p class="text-xs text-gray-400 mb-3">Disponibles: 10</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addToCart('Traje Ejecutivo Marino', 4500)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg text-xs transition">Agregar</button>
+                            <button class="px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition"><i class="fa-solid fa-heart text-xs"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Producto 2 -->
+                    <div class="product-card p-4 flex flex-col justify-between" data-category="camisas" data-search="camisa algodón bemberg camisa de vestir">
+                        <div class="product-image-container mb-3">
+                            <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?q=80&w=400&auto=format&fit=crop" alt="Camisa">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">Camisa de Algodón Bemberg</h3>
+                            <p class="text-amber-600 font-bold text-base my-1">$850</p>
+                            <p class="text-xs text-gray-400 mb-3">Disponibles: 25</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addToCart('Camisa Algodón Bemberg', 850)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg text-xs transition">Agregar</button>
+                            <button class="px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition"><i class="fa-solid fa-heart text-xs"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Producto 3 -->
+                    <div class="product-card p-4 flex flex-col justify-between" data-category="sacos" data-search="saco blazer lana saco blazer">
+                        <div class="product-image-container mb-3">
+                            <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=400&auto=format&fit=crop" alt="Saco">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">Saco Blazer de Lana</h3>
+                            <p class="text-amber-600 font-bold text-base my-1">$2,900</p>
+                            <p class="text-xs text-gray-400 mb-3">Disponibles: 8</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addToCart('Saco Blazer Lana', 2900)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg text-xs transition">Agregar</button>
+                            <button class="px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition"><i class="fa-solid fa-heart text-xs"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Producto 4 -->
+                    <div class="product-card p-4 flex flex-col justify-between" data-category="sacos" data-search="chaleco tradicional vestir saco chaleco">
+                        <div class="product-image-container mb-3">
+                            <img src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=400&auto=format&fit=crop" alt="Chaleco">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">Chaleco Tradicional de Vestir</h3>
+                            <p class="text-amber-600 font-bold text-base my-1">$1,200</p>
+                            <p class="text-xs text-gray-400 mb-3">Disponibles: 15</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addToCart('Chaleco Tradicional', 1200)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg text-xs transition">Agregar</button>
+                            <button class="px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition"><i class="fa-solid fa-heart text-xs"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Producto 5 -->
+                    <div class="product-card p-4 flex flex-col justify-between" data-category="accesorios" data-search="corbata seda italiana accesorios">
+                        <div class="product-image-container mb-3">
+                            <img src="https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?q=80&w=400&auto=format&fit=crop" alt="Corbata">
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm line-clamp-1">Corbata de Seda Italiana</h3>
+                            <p class="text-amber-600 font-bold text-base my-1">$450</p>
+                            <p class="text-xs text-gray-400 mb-3">Disponibles: 30</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addToCart('Corbata Seda Italiana', 450)" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg text-xs transition">Agregar</button>
+                            <button class="px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition"><i class="fa-solid fa-heart text-xs"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+                <p id="noProductsMessage" class="hidden text-center text-gray-500 py-10">No encontramos productos con esos criterios.</p>
+            </div>
+        </section>
+
+        <!-- ================= SECCIÓN 2: PEDIDOS PERSONALIZADOS ================= -->
+        <section id="sec-pedidos" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 max-w-3xl mx-auto">
+                <div class="flex items-center space-x-3 pb-4 border-b border-gray-100 mb-6">
+                    <div class="p-3 bg-amber-100 text-amber-600 rounded-xl">
+                        <i class="fa-solid fa-tape text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-serif-title text-2xl font-bold text-gray-900">Solicitud de Pedido Personalizado</h2>
+                        <p class="text-xs text-gray-500">Diseñamos prendas Bespoke a la medida exacta de tus requerimientos.</p>
+                    </div>
+                </div>
+
+                <form onsubmit="submitCustomOrder(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tipo de Prenda</label>
+                            <select required class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-amber-500 focus:border-amber-500">
+                                <option value="">Selecciona una opción</option>
+                                <option value="traje">Traje Completo (Saco y Pantalón)</option>
+                                <option value="saco">Saco / Blazer Individual</option>
+                                <option value="camisa">Camisa a Medida</option>
+                                <option value="vestido">Vestido / Traje Dama Sastre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tipo de Tela Preferida</label>
+                            <select required class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-amber-500 focus:border-amber-500">
+                                <option value="lana">Lana 100% Italiana Super 150s</option>
+                                <option value="lino">Lino Fresco de Verano</option>
+                                <option value="algodon">Algodón Egipcio Extra Fino</option>
+                                <option value="seda">Seda & Mezcla Premium</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Especificaciones de Medidas o Detalles</label>
+                        <textarea rows="4" required placeholder="Ingresa tus medidas (Pecho, Espalda, Largo, Cintura) o los detalles de diseño que deseas para tu prenda..." class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-amber-500 focus:border-amber-500"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md transition">
+                        Enviar Solicitud al Maestro Sastre
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= SECCIÓN 3: BUZÓN DE QUEJAS Y SUGERENCIAS ================= -->
+        <section id="sec-quejas" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200 max-w-3xl mx-auto">
+                <div class="flex items-center space-x-3 pb-4 border-b border-gray-100 mb-6">
+                    <div class="p-3 bg-red-100 text-red-600 rounded-xl">
+                        <i class="fa-solid fa-comment-dots text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-serif-title text-2xl font-bold text-gray-900">Buzón de Quejas y Sugerencias</h2>
+                        <p class="text-xs text-gray-500">Tu opinión nos ayuda a mantener los más altos estándares de excelencia.</p>
+                    </div>
+                </div>
+
+                <form onsubmit="submitComplaint(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tipo de Comentario</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                                <input type="radio" name="tipo" value="queja" checked class="text-amber-500 focus:ring-amber-500">
+                                <span>Queja</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                                <input type="radio" name="tipo" value="sugerencia" class="text-amber-500 focus:ring-amber-500">
+                                <span>Sugerencia</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Asunto</label>
+                        <input type="text" required placeholder="Ej. Atención en sucursal, Retraso en entrega..." class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Descripción Detallada</label>
+                        <textarea rows="4" required placeholder="Describe lo ocurrido o tu sugerencia para ayudarnos a mejorar..." class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-amber-500 focus:border-amber-500"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-emeraldCustom-600 hover:bg-emeraldCustom-700 text-white font-bold rounded-xl shadow-md transition">
+                        Enviar Mensaje
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER (Estilo MarketGo) -->
+    <footer class="bg-gray-900 text-white border-t border-gray-800 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400">
+            <p>© 2026 Sastrería Royale - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <!-- MODAL POPUP: DASHBOARD / MENÚ CON LAS 3 OPCIONES -->
+    <div id="dashboardModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 relative transform transition-all">
+            <button onclick="closeModal('dashboardModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fa-solid fa-table-columns text-xl"></i>
+                </div>
+                <h3 class="font-serif-title text-xl font-bold text-gray-900">Menú Principal</h3>
+                <p class="text-xs text-gray-500">Selecciona una de las opciones para navegar</p>
+            </div>
+
+            <!-- Las 3 Opciones Solicitadas -->
+            <div class="space-y-3">
+                <button onclick="showSection('tienda')" class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 rounded-xl transition text-left group">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2.5 bg-amber-500 text-white rounded-lg">
+                            <i class="fa-solid fa-house"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-gray-800 block text-sm">1. Ir a la Página Principal</span>
+                            <span class="text-[11px] text-gray-500">Ver catálogo y tienda de productos</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+
+                <button onclick="showSection('pedidos')" class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 rounded-xl transition text-left group">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2.5 bg-emeraldCustom-600 text-white rounded-lg">
+                            <i class="fa-solid fa-tape"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-gray-800 block text-sm">2. Pedidos Personalizados</span>
+                            <span class="text-[11px] text-gray-500">Solicitar trajes y prendas a medida</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+
+                <button onclick="showSection('quejas')" class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-amber-50 border border-gray-200 hover:border-amber-300 rounded-xl transition text-left group">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2.5 bg-red-500 text-white rounded-lg">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-gray-800 block text-sm">3. Quejas y Sugerencias</span>
+                            <span class="text-[11px] text-gray-500">Envíanos tus comentarios</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-gray-400 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARRITO -->
+    <div id="cartModal" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+            <button onclick="closeModal('cartModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="font-serif-title text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-cart-shopping text-amber-500"></i>
+                <span>Tu Carrito de Compras</span>
+            </h3>
+            <div id="cartItems" class="space-y-3 max-h-60 overflow-y-auto mb-4 text-sm text-gray-600 border-t border-b py-3">
+                <p class="text-center text-gray-400 py-4">El carrito está vacío</p>
+            </div>
+            <div class="flex justify-between font-bold text-gray-800 text-base mb-4">
+                <span>Total:</span>
+                <span id="cartTotal" class="text-amber-600">$0</span>
+            </div>
+            <button onclick="alert('¡Gracias por tu compra!')" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition">
+                Procesar Pedido
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT DE NAVEGACIÓN Y FUNCIONALIDAD -->
+    <script>
+        const temaGuardado = localStorage.getItem('sisvemTheme');
+        if (temaGuardado === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        const usuarioActual = JSON.parse(sessionStorage.getItem('sisvemUser') || 'null');
+
+        if (usuarioActual && usuarioActual.rol === 'administrador_general') {
+            window.location.replace('administrador_general.html');
+        } else if (!usuarioActual || !usuarioActual.email) {
+            window.location.replace('index.html');
+        } else {
+            document.getElementById('userName').textContent = usuarioActual.nombre;
+            document.getElementById('userEmail').textContent = usuarioActual.email;
+        }
+
+        let cart = [];
+
+        function normalizarTexto(texto) {
+            return texto
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+        }
+
+        function filtrarProductos() {
+            const searchTerm = normalizarTexto(document.getElementById('productSearch').value);
+            const selectedCategory = document.getElementById('categoryFilter').value;
+            const products = document.querySelectorAll('.product-card');
+            const noProductsMessage = document.getElementById('noProductsMessage');
+            const productCount = document.getElementById('productCount');
+            let visibleProducts = 0;
+
+            products.forEach((product) => {
+                const productText = normalizarTexto(product.dataset.search || product.textContent);
+                const matchesSearch = !searchTerm || productText.includes(searchTerm);
+                const matchesCategory = selectedCategory === 'todas' || product.dataset.category === selectedCategory;
+                const isVisible = matchesSearch && matchesCategory;
+
+                product.classList.toggle('hidden', !isVisible);
+                if (isVisible) {
+                    visibleProducts += 1;
+                }
+            });
+
+            productCount.textContent = visibleProducts + (visibleProducts === 1 ? ' producto' : ' productos');
+            noProductsMessage.classList.toggle('hidden', visibleProducts !== 0);
+        }
+
+        function showSection(sectionId) {
+            const sections = ['tienda', 'pedidos', 'quejas'];
+
+            if (!sections.includes(sectionId)) {
+                return;
+            }
+
+            sections.forEach((section) => {
+                document.getElementById('sec-' + section).classList.add('hidden');
+            });
+
+            document.getElementById('sec-' + sectionId).classList.remove('hidden');
+            closeModal('dashboardModal');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cerrarSesion() {
+            sessionStorage.removeItem('sisvemUser');
+        }
+
+        function actualizarControlTema() {
+            const modoOscuro = document.body.classList.contains('dark-theme');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeToggle = document.getElementById('themeToggle');
+
+            themeIcon.className = modoOscuro
+                ? 'fa-solid fa-sun text-lg'
+                : 'fa-solid fa-moon text-lg';
+            themeToggle.title = modoOscuro ? 'Activar modo claro' : 'Activar modo oscuro';
+            themeToggle.setAttribute('aria-label', themeToggle.title);
+        }
+
+        function alternarTema() {
+            const modoOscuro = document.body.classList.toggle('dark-theme');
+            localStorage.setItem('sisvemTheme', modoOscuro ? 'dark' : 'light');
+            actualizarControlTema();
+        }
+
+        actualizarControlTema();
+
+        function openDashboardModal() {
+            document.getElementById('dashboardModal').classList.remove('hidden');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function scrollToProducts() {
+            document.getElementById('productos-anchor').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('productSearch').addEventListener('input', filtrarProductos);
+        document.getElementById('categoryFilter').addEventListener('change', filtrarProductos);
+
+        function addToCart(title, price) {
+            cart.push({ title, price });
+            updateCart();
+            openModal('cartModal');
+        }
+
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartBadge = document.getElementById('cartBadge');
+            const cartTotal = document.getElementById('cartTotal');
+
+            cartBadge.textContent = cart.length;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-center text-gray-400 py-4">El carrito está vacío</p>';
+                cartTotal.textContent = '$0';
+                return;
+            }
+
+            let total = 0;
+            cartItems.innerHTML = cart.map((item) => {
+                total += item.price;
+                return `<div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg">
+                    <span class="font-medium text-gray-800">${item.title}</span>
+                    <span class="font-bold text-amber-600">$${item.price}</span>
+                </div>`;
+            }).join('');
+
+            cartTotal.textContent = '$' + total.toLocaleString();
+        }
+
+        function submitCustomOrder(e) {
+            e.preventDefault();
+            alert('¡Tu solicitud de pedido personalizado ha sido enviada con éxito! Un sastre se pondrá en contacto contigo.');
+            showSection('tienda');
+        }
+
+        function submitComplaint(e) {
+            e.preventDefault();
+            alert('¡Gracias por tus comentarios! Hemos recibido tu mensaje.');
+            showSection('tienda');
+        }
+    </script>
+</body>
+</html>

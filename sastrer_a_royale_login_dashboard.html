@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sastrería Royale - Iniciar Sesión</title>
+    <!-- FontAwesome para los íconos de agujas, tijeras, candados, ojo, etc. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Playfair Display (Titulos elegantes) e Inter (Lectura limpia) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#e5c158',
+                            500: '#d4af37',
+                            600: '#aa8c2c',
+                            700: '#856d21',
+                        },
+                        emeraldCustom: {
+                            500: '#0d5c46',
+                            600: '#094736',
+                            700: '#053326',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* ============================================================
+           EXPLICACIÓN DE CÓMO PONER TU IMAGEN DE FONDO EN CSS:
+           ------------------------------------------------------------
+           En la regla body o #bg-overlay a continuación, reemplaza el enlace 
+           https://... por la ruta local de tu archivo, por ejemplo:
+           
+           background-image: url('mi-imagen-sastrería.jpg');
+           
+           Propiedades clave:
+           - background-size: cover; (Asegura que cubra toda la pantalla)
+           - background-position: center; (Centra la imagen)
+           - background-repeat: no-repeat; (Evita que se repita la imagen)
+        ============================================================ */
+
+        .bg-tailor-shop {
+            /* Ruta de la imagen de fondo de la sastrería */
+            background-image: url('https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Capa de superposición oscura (Dark Overlay) con filtro blur opcional */
+        .bg-overlay {
+            background: linear-gradient(135deg, rgba(10, 15, 13, 0.82) 0%, rgba(20, 20, 20, 0.75) 100%);
+        }
+
+        /* Estilo del Header Curved del Card (similar a la imagen de referencia) */
+        .card-header-curved {
+            background: linear-gradient(135deg, #0d5c46 0%, #063c2d 100%);
+            border-bottom-left-radius: 50% 15px;
+            border-bottom-right-radius: 50% 15px;
+            box-shadow: 0 4px 15px rgba(13, 92, 70, 0.4);
+        }
+
+        /* Animación suave para inputs y botones */
+        .input-group-custom:focus-within {
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Efecto Glassmorphism sutil para el contenedor principal */
+        .login-card {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Transición de pantalla de Login a Dashboard principal */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-gray-900 min-h-screen text-gray-800 selection:bg-gold-500 selection:text-white">
+
+    <!-- CONTENEDOR PRINCIPAL DEL LOGIN CON FONDO Y OVERLAY -->
+    <div id="loginView" class="min-h-screen bg-tailor-shop flex items-center justify-center p-4 relative">
+        <!-- Overlay Oscuro sobre la imagen para legibilidad -->
+        <div class="absolute inset-0 bg-overlay"></div>
+
+        <!-- TARJETA DEL FORMULARIO DE LOGIN (INSPIRADO EN TU IMAGEN) -->
+        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden login-card z-10 transition-all duration-300 transform">
+            
+            <!-- Encabezado Curvo Verde Esmeralda Royale -->
+            <div class="card-header-curved pt-8 pb-7 px-6 text-center text-white relative">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gold-500/20 mb-2 border border-gold-400/40">
+                    <i class="fa-solid fa-scissors text-gold-400 text-xl"></i>
+                </div>
+                <h1 class="font-serif text-2xl font-bold tracking-wide text-white">
+                    Bienvenido a Sastrería Royale
+                </h1>
+                <p class="text-xs text-emerald-100/80 mt-1 uppercase tracking-widest font-medium">Alta Costura & Medida</p>
+            </div>
+
+            <!-- Cuerpos del Formulario -->
+            <div class="p-6 sm:p-8 space-y-5">
+                
+                <p class="text-center text-gray-500 text-sm font-medium">
+                    Inicia sesión en tu cuenta
+                </p>
+
+                <!-- Mensaje de Alerta / Error -->
+                <div id="alertBox" class="hidden p-3 text-xs rounded-lg bg-red-50 text-red-600 border border-red-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-exclamation text-red-500 text-sm"></i>
+                    <span id="alertMessage">Por favor completa todos los campos correctamente.</span>
+                </div>
+
+                <!-- Formulario de Entrada -->
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    
+                    <!-- Campo: Correo Electrónico -->
+                    <div>
+                        <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                required 
+                                placeholder="Correo electrónico" 
+                                class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                value="cliente@sastreria.com"
+                            >
+                            <div class="px-3.5 text-gray-400 border-l border-gray-200">
+                                <i class="fa-regular fa-envelope"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo: Contraseña con Toggle de Ojo -->
+                    <div>
+                        <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                required 
+                                placeholder="Contraseña" 
+                                class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                value="123456"
+                            >
+                            <button 
+                                type="button" 
+                                onclick="togglePasswordVisibility()" 
+                                class="px-3.5 text-gray-400 hover:text-gray-600 transition border-l border-gray-200 focus:outline-none"
+                                title="Mostrar/Ocultar Contraseña"
+                            >
+                                <i id="toggleIcon" class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox Recordar datos -->
+                    <div class="flex items-center justify-between text-xs text-gray-600 pt-1">
+                        <label class="flex items-center space-x-2 cursor-pointer select-none">
+                            <input type="checkbox" checked class="w-4 h-4 rounded text-emeraldCustom-600 focus:ring-emeraldCustom-500 border-gray-300">
+                            <span>Recordar mis datos</span>
+                        </label>
+                        <a href="#" onclick="showInfoModal('Recuperación de Contraseña', 'Se ha enviado un enlace de restablecimiento a tu correo registrado.')" class="text-emeraldCustom-600 font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <!-- Botón Iniciar Sesión (Con estado de carga y funcionalidad de envío) -->
+                    <button 
+                        type="submit" 
+                        id="submitBtn" 
+                        class="w-full py-3.5 px-4 bg-emeraldCustom-600 hover:bg-emeraldCustom-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition transform active:scale-[0.99] flex items-center justify-center space-x-2 group"
+                    >
+                        <span id="btnText" class="flex items-center space-x-2">
+                            <i class="fa-solid fa-right-to-bracket text-gold-400 group-hover:translate-x-0.5 transition-transform"></i>
+                            <span>Iniciar Sesión</span>
+                        </span>
+                        <span id="btnSpinner" class="hidden flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-notch fa-spin text-white"></i>
+                            <span>Validando credenciales...</span>
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Enlace de Registro -->
+                <div class="text-center pt-2">
+                    <p class="text-xs text-gray-500">¿No tienes cuenta?</p>
+                    <button onclick="showInfoModal('Registro de Cliente', 'Bienvenido a Sastrería Royale. Para solicitar una cuenta de cliente exclusivo o cita previa, comunícate con nuestro taller directo.')" class="inline-flex items-center space-x-1.5 text-sm font-bold text-emeraldCustom-600 hover:text-emeraldCustom-700 mt-1 hover:underline">
+                        <i class="fa-solid fa-user-plus text-xs"></i>
+                        <span>Regístrate aquí</span>
+                    </button>
+                </div>
+
+                <!-- Sección Inferior de Características (Similares a Ventas, Inventario, etc.) -->
+                <div class="pt-4 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
+                    <div class="p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="showInfoModal('Citas Exclusivas', 'Agenda tu sesión privada con nuestro maestro sastre.')">
+                        <div class="text-emeraldCustom-600 text-lg mb-1">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600 block leading-tight">Citas Exclusivas</span>
+                    </div>
+
+                    <div class="p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="showInfoModal('Trajes a Medida', 'Diseño de trajes Bespoke y confección fina artesanal.')">
+                        <div class="text-emeraldCustom-600 text-lg mb-1">
+                            <i class="fa-solid fa-vest"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600 block leading-tight">Trajes a Medida</span>
+                    </div>
+
+                    <div class="p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="showInfoModal('Catálogo Premium', 'Explora nuestras telas italianas e inglesas de lana 150s.')">
+                        <div class="text-emeraldCustom-600 text-lg mb-1">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600 block leading-tight">Catálogo Premium</span>
+                    </div>
+                </div>
+
+                <!-- Footer versión -->
+                <div class="text-center pt-2">
+                    <span class="text-[10px] text-gray-400 flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-shirt"></i>
+                        <span>Sastrería Royale v1.0 • Sistema Taller</span>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PÁGINA PRINCIPAL / DASHBOARD SIMULADO (A DONDE REDIRIGE EL BOTÓN) -->
+    <div id="dashboardView" class="hidden min-h-screen bg-gray-100 fade-in">
+        <!-- Navegación Superior del Sistema -->
+        <nav class="bg-gray-900 text-white border-b border-gold-500/30 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-emeraldCustom-600 flex items-center justify-center text-gold-400 border border-gold-500/40">
+                    <i class="fa-solid fa-scissors"></i>
+                </div>
+                <div>
+                    <h2 class="font-serif font-bold text-lg text-gold-400 leading-none">Sastrería Royale</h2>
+                    <span class="text-xs text-gray-400">Panel de Control & Ateliers</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-semibold text-gray-200" id="userDisplayName">Don Alejandro Silva</p>
+                    <p class="text-xs text-gold-400">Cliente VIP Bespoke</p>
+                </div>
+                <button onclick="logout()" class="px-3 py-1.5 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white rounded-lg text-xs font-semibold transition flex items-center space-x-1 border border-red-500/30">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Contenido del Dashboard de la Sastrería -->
+        <main class="max-w-7xl mx-auto p-6 space-y-6">
+            <!-- Banner de Bienvenida -->
+            <div class="bg-gradient-to-r from-emeraldCustom-700 to-gray-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center relative overflow-hidden border border-gold-500/20">
+                <div class="z-10 max-w-xl">
+                    <span class="px-3 py-1 bg-gold-500/20 text-gold-400 rounded-full text-xs font-semibold uppercase tracking-wider border border-gold-400/30">Sesión Iniciada con Éxito</span>
+                    <h1 class="font-serif text-3xl font-bold mt-2 text-white">¡Bienvenido de vuelta a tu Atelier!</h1>
+                    <p class="text-gray-300 text-sm mt-2">
+                        Tienes 2 trajes en proceso de confección y tu próxima prueba de medidas está programada para este viernes a las 17:00 hrs.
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 z-10">
+                    <button onclick="showInfoModal('Nueva Cita', 'Formulario para agendar nueva toma de medidas iniciado.')" class="px-5 py-3 bg-gold-500 hover:bg-gold-600 text-gray-900 font-bold text-sm rounded-xl shadow-lg transition flex items-center space-x-2">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span>Agendar Cita de Medidas</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resumen de Pedidos en la Sastrería -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-3 bg-emerald-50 text-emeraldCustom-600 rounded-xl">
+                            <i class="fa-solid fa-vest-patches text-xl"></i>
+                        </span>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full">En Confección</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-gray-800 text-lg">Traje 3 Piezas Súper 150s</h3>
+                    <p class="text-xs text-gray-500 mt-1">Lana Italiana Azul Marino • Hilado Fino</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Próxima Prueba:</span>
+                        <span class="font-semibold text-gray-800">24 de Septiembre</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-3 bg-amber-50 text-gold-600 rounded-xl">
+                            <i class="fa-solid fa-ruler-combined text-xl"></i>
+                        </span>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-800 rounded-full">Corte de Patrón</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-gray-800 text-lg">Smoking de Etiqueta</h3>
+                    <p class="text-xs text-gray-500 mt-1">Lana & Seda Negra con Solapa de Rasó</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Avance Taller:</span>
+                        <span class="font-semibold text-gray-800">45% completado</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <i class="fa-solid fa-shirt text-xl"></i>
+                        </span>
+                        <span class="text-xs font-bold px-2.5 py-1 bg-green-100 text-green-800 rounded-full">Listo para Entrega</span>
+                    </div>
+                    <h3 class="font-serif font-bold text-gray-800 text-lg">Camisas Ejecutivas (x3)</h3>
+                    <p class="text-xs text-gray-500 mt-1">Algodón Egipcio Blanco y Azul Cielo</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center text-xs">
+                        <span class="text-gray-500">Ubicación:</span>
+                        <span class="font-semibold text-gray-800">Atelier Principal</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL INFORMATIVO (REEMPLAZO SEGURO PARA NO USAR alert()) -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform transition-all border border-gray-100 text-center">
+            <div class="w-12 h-12 bg-emerald-50 text-emeraldCustom-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl border border-emerald-100">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="modalTitle" class="font-serif text-lg font-bold text-gray-800 mb-2">Información</h3>
+            <p id="modalBody" class="text-sm text-gray-600 mb-6">Detalle de la acción realizada.</p>
+            <button onclick="closeInfoModal()" class="w-full py-2.5 bg-emeraldCustom-600 hover:bg-emeraldCustom-700 text-white font-semibold rounded-lg text-sm transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT DE FUNCIONALIDAD -->
+    <script>
+        // 1. Mostrar/Ocultar contraseña (Toggle visibility)
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // 2. Manejo de Inicio de Sesión y Redirección Simulada
+        function handleLogin(event) {
+            event.preventDefault(); // Evita que la página se recargue
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            // Ocultar alertas previas
+            alertBox.classList.add('hidden');
+
+            // Validaciones básicas de campos
+            if (!email || !password) {
+                alertMessage.textContent = 'Por favor completa todos los campos.';
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            if (password.length < 4) {
+                alertMessage.textContent = 'La contraseña debe tener al menos 4 caracteres.';
+                alertBox.classList.remove('hidden');
+                return;
+            }
+
+            // Simulación de Estado de Carga (Loading state)
+            submitBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnSpinner.classList.remove('hidden');
+
+            // Simular petición al servidor (2 segundos de retardo)
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnSpinner.classList.add('hidden');
+
+                // Obtener nombre de usuario a partir del email
+                const userName = email.split('@')[0];
+                const formattedName = userName.charAt(0).toUpperCase() + userName.slice(1);
+                document.getElementById('userDisplayName').textContent = formattedName;
+
+                // Transición a la página principal / Dashboard
+                document.getElementById('loginView').classList.add('hidden');
+                document.getElementById('dashboardView').classList.remove('hidden');
+
+                /* 
+                   NOTA UNIVERSIDAD: Para redirigir a una página física real independiente (ej. dashboard.html), 
+                   reemplaza las dos líneas anteriores por esta:
+                   
+                   window.location.href = "dashboard.html";
+                */
+            }, 1200);
+        }
+
+        // 3. Función para Cerrar Sesión y volver al Login
+        function logout() {
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('password').value = '';
+        }
+
+        // 4. Modal Informativo (Sustituto de alert)
+        function showInfoModal(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').textContent = message;
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

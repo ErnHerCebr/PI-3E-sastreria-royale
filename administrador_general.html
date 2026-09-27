@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador General - Sastrería Royale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }, colors: { royale: { 700: '#094736', 800: '#053326' } } } }
+        };
+    </script>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 antialiased min-h-screen">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-20 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-royale-700 text-amber-300 flex items-center justify-center"><i class="fa-solid fa-scissors"></i></div>
+                <div>
+                    <div class="font-serif text-lg font-bold text-gray-900">Sastrería Royale</div>
+                    <div class="text-[10px] uppercase tracking-widest text-gray-500">Administrador general</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:block text-right">
+                    <div id="adminName" class="text-xs font-bold text-gray-800"></div>
+                    <div id="adminEmail" class="text-[11px] text-gray-500"></div>
+                </div>
+                <a href="cerrar_sesion.php" title="Cerrar sesión" aria-label="Cerrar sesión" class="p-2 text-gray-500 hover:text-red-600 rounded-lg hover:bg-gray-100"><i class="fa-solid fa-right-from-bracket"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+            <div>
+                <p class="text-xs uppercase tracking-widest font-semibold text-amber-700">Control de operaciones</p>
+                <h1 class="font-serif text-3xl font-bold text-gray-900">Panel general</h1>
+            </div>
+            <p id="lastUpdated" class="text-xs text-gray-500"></p>
+        </div>
+
+        <div id="adminAlert" class="hidden mb-5 p-3 rounded-lg text-sm" role="status"></div>
+
+        <nav class="flex gap-2 overflow-x-auto border-b border-gray-200 mb-6" aria-label="Secciones de administración">
+            <button type="button" data-panel="resumen" class="admin-tab active-tab px-4 py-3 text-sm font-semibold whitespace-nowrap"><i class="fa-solid fa-chart-pie mr-2"></i>Resumen</button>
+            <button type="button" data-panel="sucursales" class="admin-tab px-4 py-3 text-sm font-semibold whitespace-nowrap"><i class="fa-solid fa-shop mr-2"></i>Sucursales</button>
+            <button type="button" data-panel="gerentes" class="admin-tab px-4 py-3 text-sm font-semibold whitespace-nowrap"><i class="fa-solid fa-user-tie mr-2"></i>Gerentes</button>
+            <button type="button" data-panel="inventario" class="admin-tab px-4 py-3 text-sm font-semibold whitespace-nowrap"><i class="fa-solid fa-boxes-stacked mr-2"></i>Inventarios</button>
+            <button type="button" data-panel="ventas" class="admin-tab px-4 py-3 text-sm font-semibold whitespace-nowrap"><i class="fa-solid fa-receipt mr-2"></i>Ventas</button>
+        </nav>
+
+        <section id="panel-resumen" class="admin-panel space-y-6">
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3" id="summaryCards"></div>
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h2 class="font-bold text-gray-900">Sucursales</h2>
+                    <button type="button" onclick="showPanel('sucursales')" class="text-sm font-semibold text-emerald-800 hover:underline">Gestionar sucursales</button>
+                </div>
+                <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Sucursal</th><th>Gerente</th><th>Artículos</th><th>Unidades</th></tr></thead><tbody id="overviewBranches"></tbody></table></div>
+            </div>
+            <p class="text-xs text-gray-500">Las consultas muestran la información registrada en sucursales, inventarios y ventas.</p>
+        </section>
+
+        <section id="panel-sucursales" class="admin-panel hidden space-y-6">
+            <form id="branchForm" class="bg-white border border-gray-200 rounded-lg p-5">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div><h2 id="branchFormTitle" class="font-bold text-gray-900">Crear sucursal</h2><p class="text-xs text-gray-500 mt-1">Registra o modifica los datos de una sede.</p></div>
+                    <button id="cancelBranchEdit" type="button" class="hidden text-sm text-gray-600 hover:text-gray-900">Cancelar edición</button>
+                </div>
+                <input id="branchId" type="hidden">
+                <div class="grid sm:grid-cols-3 gap-3">
+                    <label class="text-xs font-semibold text-gray-700">Nombre<input id="branchName" required maxlength="120" class="admin-input mt-1" placeholder="Sucursal Centro"></label>
+                    <label class="text-xs font-semibold text-gray-700 sm:col-span-1">Dirección<input id="branchAddress" required maxlength="255" class="admin-input mt-1" placeholder="Calle, número, ciudad"></label>
+                    <label class="text-xs font-semibold text-gray-700">Teléfono<input id="branchPhone" maxlength="30" class="admin-input mt-1" placeholder="Teléfono de contacto"></label>
+                </div>
+                <button type="submit" class="mt-4 px-4 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white text-sm font-semibold rounded-lg"><i class="fa-solid fa-floppy-disk mr-2"></i>Guardar sucursal</button>
+            </form>
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="p-4 border-b border-gray-200"><h2 class="font-bold text-gray-900">Sucursales registradas</h2></div>
+                <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Gerente</th><th>Acciones</th></tr></thead><tbody id="branchesTable"></tbody></table></div>
+            </div>
+        </section>
+
+        <section id="panel-gerentes" class="admin-panel hidden space-y-6">
+            <form id="managerForm" class="bg-white border border-gray-200 rounded-lg p-5">
+                <h2 class="font-bold text-gray-900">Registrar gerente</h2>
+                <p class="text-xs text-gray-500 mt-1 mb-4">La cuenta se crea con rol de gerente y queda asignada a una sucursal.</p>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <label class="text-xs font-semibold text-gray-700">Nombre<input id="managerName" required maxlength="100" class="admin-input mt-1"></label>
+                    <label class="text-xs font-semibold text-gray-700">Correo<input id="managerEmail" type="email" required maxlength="255" class="admin-input mt-1"></label>
+                    <label class="text-xs font-semibold text-gray-700">Contraseña temporal<input id="managerPassword" type="password" required minlength="8" class="admin-input mt-1" autocomplete="new-password"></label>
+                    <label class="text-xs font-semibold text-gray-700">Sucursal<select id="managerBranch" required class="admin-input mt-1"></select></label>
+                </div>
+                <button type="submit" class="mt-4 px-4 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white text-sm font-semibold rounded-lg"><i class="fa-solid fa-user-plus mr-2"></i>Crear gerente</button>
+            </form>
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="p-4 border-b border-gray-200"><h2 class="font-bold text-gray-900">Gerentes y asignaciones</h2></div>
+                <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Gerente</th><th>Correo</th><th>Sucursal asignada</th><th>Nueva asignación</th></tr></thead><tbody id="managersTable"></tbody></table></div>
+            </div>
+        </section>
+
+        <section id="panel-inventario" class="admin-panel hidden">
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="p-4 border-b border-gray-200"><h2 class="font-bold text-gray-900">Inventario por sucursal</h2><p class="text-xs text-gray-500 mt-1">Consulta de existencias registradas en cada sede.</p></div>
+                <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Sucursal</th><th>Producto</th><th>Unidades</th><th>Última actualización</th></tr></thead><tbody id="inventoryTable"></tbody></table></div>
+            </div>
+        </section>
+
+        <section id="panel-ventas" class="admin-panel hidden">
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="p-4 border-b border-gray-200"><h2 class="font-bold text-gray-900">Ventas realizadas</h2><p class="text-xs text-gray-500 mt-1">Últimas 100 ventas registradas en el sistema.</p></div>
+                <div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Fecha</th><th>Sucursal</th><th>Producto</th><th>Cantidad</th><th>Total</th></tr></thead><tbody id="salesTable"></tbody></table></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const usuarioAdmin = JSON.parse(sessionStorage.getItem('sisvemUser') || 'null');
+        if (!usuarioAdmin || usuarioAdmin.rol !== 'administrador_general') {
+            window.location.replace('index.html');
+        } else {
+            document.getElementById('adminName').textContent = usuarioAdmin.nombre;
+            document.getElementById('adminEmail').textContent = usuarioAdmin.email;
+        }
+
+        let datosPanel = { sucursales: [], gerentes: [], inventario: [], ventas: [] };
+        const pesos = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+        const fecha = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' });
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[character]);
+        }
+
+        function avisar(mensaje, error = false) {
+            const caja = document.getElementById('adminAlert');
+            caja.textContent = mensaje;
+            caja.className = `mb-5 p-3 rounded-lg text-sm ${error ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}`;
+            window.setTimeout(() => caja.classList.add('hidden'), 5000);
+        }
+
+        async function solicitar(url, opciones = {}) {
+            const headers = { ...(opciones.headers || {}) };
+            if (opciones.body) {
+                headers['Content-Type'] = 'application/json';
+                headers['X-CSRF-Token'] = usuarioAdmin.csrfToken || '';
+            }
+            const response = await fetch(url, { ...opciones, headers });
+            const resultado = await response.json();
+            if (response.status === 403 || response.status === 419) {
+                sessionStorage.removeItem('sisvemUser');
+                window.location.replace('index.html');
+                throw new Error(resultado.message || 'La sesión terminó.');
+            }
+            if (!response.ok || resultado.status !== 'success') throw new Error(resultado.message || 'No se pudo completar la operación.');
+            return resultado;
+        }
+
+        function filaVacia(columnas, mensaje) {
+            return `<tr><td colspan="${columnas}" class="text-center text-gray-500 py-8">${escapeHtml(mensaje)}</td></tr>`;
+        }
+
+        function renderizar(data) {
+            datosPanel = data;
+            const r = data.resumen;
+            const tarjetas = [
+                ['Sucursales', r.sucursales, 'fa-shop', 'text-emerald-800'],
+                ['Gerentes', r.gerentes, 'fa-user-tie', 'text-amber-700'],
+                ['Clientes', r.clientes, 'fa-users', 'text-sky-700'],
+                ['Unidades en inventario', r.unidades, 'fa-boxes-stacked', 'text-violet-700'],
+                ['Ingresos registrados', pesos.format(Number(r.ingresos)), 'fa-sack-dollar', 'text-rose-700']
+            ];
+            document.getElementById('summaryCards').innerHTML = tarjetas.map(([label, value, icon, color]) => `
+                <article class="bg-white border border-gray-200 rounded-lg p-4 min-h-28">
+                    <div class="flex items-center justify-between text-xs text-gray-500"><span>${label}</span><i class="fa-solid ${icon} ${color} text-base"></i></div>
+                    <div class="mt-3 text-2xl font-bold text-gray-900">${escapeHtml(value)}</div>
+                </article>`).join('');
+
+            const branchRows = data.sucursales.map((branch) => `<tr><td class="font-semibold text-gray-900">${escapeHtml(branch.nombre)}</td><td>${escapeHtml(branch.gerente || 'Sin asignar')}</td><td>${escapeHtml(branch.productos_inventario)}</td><td>${escapeHtml(branch.unidades)}</td></tr>`).join('');
+            document.getElementById('overviewBranches').innerHTML = branchRows || filaVacia(4, 'Todavía no hay sucursales registradas.');
+            document.getElementById('branchesTable').innerHTML = data.sucursales.map((branch) => `<tr>
+                <td class="font-semibold text-gray-900">${escapeHtml(branch.nombre)}</td><td>${escapeHtml(branch.direccion)}</td><td>${escapeHtml(branch.telefono || '—')}</td><td>${escapeHtml(branch.gerente || 'Sin asignar')}</td>
+                <td><div class="flex gap-3"><button type="button" data-action="editar" data-id="${branch.id}" class="text-emerald-800 hover:underline">Editar</button><button type="button" data-action="eliminar" data-id="${branch.id}" class="text-red-700 hover:underline">Eliminar</button></div></td></tr>`).join('') || filaVacia(5, 'Todavía no hay sucursales registradas.');
+
+            const branchOptions = data.sucursales.map((branch) => `<option value="${branch.id}">${escapeHtml(branch.nombre)}</option>`).join('');
+            document.getElementById('managerBranch').innerHTML = branchOptions || '<option value="">Primero crea una sucursal</option>';
+            document.getElementById('managerBranch').disabled = data.sucursales.length === 0;
+            document.getElementById('managerForm').querySelector('button[type="submit"]').disabled = data.sucursales.length === 0;
+            document.getElementById('managersTable').innerHTML = data.gerentes.map((manager) => `<tr>
+                <td class="font-semibold text-gray-900">${escapeHtml(manager.nombre)}</td><td>${escapeHtml(manager.email)}</td><td>${escapeHtml(manager.sucursal || 'Sin asignar')}</td>
+                <td><div class="flex items-center gap-2"><select class="admin-input min-w-40" id="asignar-${manager.id}">${branchOptions}</select><button type="button" data-action="asignar" data-id="${manager.id}" class="text-sm font-semibold text-emerald-800 hover:underline">Asignar</button></div></td></tr>`).join('') || filaVacia(4, 'No hay gerentes registrados.');
+
+            document.getElementById('inventoryTable').innerHTML = data.inventario.map((item) => `<tr><td>${escapeHtml(item.sucursal)}</td><td class="font-semibold text-gray-900">${escapeHtml(item.producto)}</td><td>${escapeHtml(item.cantidad)}</td><td>${escapeHtml(fecha.format(new Date(item.actualizado)))}</td></tr>`).join('') || filaVacia(4, 'No hay registros de inventario todavía.');
+            document.getElementById('salesTable').innerHTML = data.ventas.map((sale) => `<tr><td>${escapeHtml(fecha.format(new Date(sale.fecha)))}</td><td>${escapeHtml(sale.sucursal)}</td><td class="font-semibold text-gray-900">${escapeHtml(sale.producto)}</td><td>${escapeHtml(sale.cantidad)}</td><td>${escapeHtml(pesos.format(Number(sale.total)))}</td></tr>`).join('') || filaVacia(5, 'No hay ventas registradas todavía.');
+            document.getElementById('lastUpdated').textContent = `Actualizado ${fecha.format(new Date())}`;
+        }
+
+        async function cargarDatos() {
+            try { renderizar(await solicitar('administrador.php')); }
+            catch (error) { avisar(error.message, true); }
+        }
+
+        function showPanel(panel) {
+            document.querySelectorAll('.admin-panel').forEach((element) => element.classList.toggle('hidden', element.id !== `panel-${panel}`));
+            document.querySelectorAll('.admin-tab').forEach((element) => element.classList.toggle('active-tab', element.dataset.panel === panel));
+        }
+
+        document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('click', () => showPanel(tab.dataset.panel)));
+
+        function limpiarFormularioSucursal() {
+            document.getElementById('branchForm').reset();
+            document.getElementById('branchId').value = '';
+            document.getElementById('branchFormTitle').textContent = 'Crear sucursal';
+            document.getElementById('cancelBranchEdit').classList.add('hidden');
+        }
+        document.getElementById('cancelBranchEdit').addEventListener('click', limpiarFormularioSucursal);
+        document.getElementById('branchForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const id = document.getElementById('branchId').value;
+            const payload = { accion: id ? 'actualizar_sucursal' : 'crear_sucursal', id, nombre: document.getElementById('branchName').value.trim(), direccion: document.getElementById('branchAddress').value.trim(), telefono: document.getElementById('branchPhone').value.trim() };
+            try { const result = await solicitar('administrador.php', { method: 'POST', body: JSON.stringify(payload) }); limpiarFormularioSucursal(); avisar(result.message); await cargarDatos(); }
+            catch (error) { avisar(error.message, true); }
+        });
+
+        document.getElementById('branchesTable').addEventListener('click', async (event) => {
+            const button = event.target.closest('button[data-action]');
+            if (!button) return;
+            const branch = datosPanel.sucursales.find((item) => String(item.id) === button.dataset.id);
+            if (button.dataset.action === 'editar' && branch) {
+                document.getElementById('branchId').value = branch.id;
+                document.getElementById('branchName').value = branch.nombre;
+                document.getElementById('branchAddress').value = branch.direccion;
+                document.getElementById('branchPhone').value = branch.telefono;
+                document.getElementById('branchFormTitle').textContent = 'Modificar sucursal';
+                document.getElementById('cancelBranchEdit').classList.remove('hidden');
+                document.getElementById('branchName').focus();
+            }
+            if (button.dataset.action === 'eliminar' && branch && confirm(`¿Eliminar la sucursal ${branch.nombre}?`)) {
+                try { const result = await solicitar('administrador.php', { method: 'POST', body: JSON.stringify({ accion: 'eliminar_sucursal', id: branch.id }) }); avisar(result.message); await cargarDatos(); }
+                catch (error) { avisar(error.message, true); }
+            }
+        });
+
+        document.getElementById('managerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const payload = { accion: 'crear_gerente', nombre: document.getElementById('managerName').value.trim(), email: document.getElementById('managerEmail').value.trim(), password: document.getElementById('managerPassword').value, sucursal_id: document.getElementById('managerBranch').value };
+            try { const result = await solicitar('administrador.php', { method: 'POST', body: JSON.stringify(payload) }); event.target.reset(); avisar(result.message); await cargarDatos(); }
+            catch (error) { avisar(error.message, true); }
+        });
+
+        document.getElementById('managersTable').addEventListener('click', async (event) => {
+            const button = event.target.closest('button[data-action="asignar"]');
+            if (!button) return;
+            const select = document.getElementById(`asignar-${button.dataset.id}`);
+            try { const result = await solicitar('administrador.php', { method: 'POST', body: JSON.stringify({ accion: 'asignar_gerente', gerente_id: button.dataset.id, sucursal_id: select.value }) }); avisar(result.message); await cargarDatos(); }
+            catch (error) { avisar(error.message, true); }
+        });
+
+        if (usuarioAdmin && usuarioAdmin.rol === 'administrador_general') cargarDatos();
+    </script>
+</body>
+</html>

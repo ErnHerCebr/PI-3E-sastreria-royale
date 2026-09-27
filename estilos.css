@@ -1,0 +1,170 @@
+/* ============================================================
+   ESTILOS PERSONALIZADOS - SASTRERÍA ROYALE
+   ============================================================ */
+
+/* Configuración de la imagen de fondo del Login */
+.bg-tailor-shop {
+    background-image: url('https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Capa de superposición oscura sobre la imagen */
+.bg-overlay {
+    background: linear-gradient(135deg, rgba(10, 15, 13, 0.82) 0%, rgba(20, 20, 20, 0.75) 100%);
+}
+
+/* Header Curvo de la Tarjeta de Login */
+.card-header-curved {
+    background: linear-gradient(135deg, #0d5c46 0%, #063c2d 100%);
+    border-bottom-left-radius: 50% 15px;
+    border-bottom-right-radius: 50% 15px;
+    box-shadow: 0 4px 15px rgba(13, 92, 70, 0.4);
+}
+
+/* Animación y foco de los campos de texto */
+.input-group-custom:focus-within {
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+/* Sombras y efecto Glassmorphism sutil para el Login */
+.login-card {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Animación Fade In de entrada */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Tema oscuro del panel principal */
+body.dark-theme {
+    background-color: #111827 !important;
+    color: #e5e7eb;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body.dark-theme header,
+body.dark-theme .bg-white {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+body.dark-theme .bg-gray-50 {
+    background-color: #111827 !important;
+}
+
+body.dark-theme .bg-gray-100,
+body.dark-theme .bg-gray-200 {
+    background-color: #374151 !important;
+}
+
+body.dark-theme .text-gray-900,
+body.dark-theme .text-gray-800,
+body.dark-theme .text-gray-700 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-theme .text-gray-600,
+body.dark-theme .text-gray-500,
+body.dark-theme .text-gray-400 {
+    color: #d1d5db !important;
+}
+
+body.dark-theme .border-gray-100,
+body.dark-theme .border-gray-200,
+body.dark-theme .border-gray-300 {
+    border-color: #4b5563 !important;
+}
+
+body.dark-theme input,
+body.dark-theme select,
+body.dark-theme textarea {
+    background-color: #1f2937;
+    color: #f3f4f6;
+    border-color: #4b5563;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+    color: #9ca3af;
+}
+
+body.dark-theme .hover\:bg-gray-50:hover,
+body.dark-theme .hover\:bg-gray-100:hover {
+    background-color: #374151 !important;
+}
+
+.admin-tab {
+    color: #6b7280;
+    border-bottom: 2px solid transparent;
+}
+
+.admin-tab:hover,
+.admin-tab.active-tab {
+    color: #094736;
+    border-bottom-color: #d4af37;
+}
+
+.admin-input {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    color: #1f2937;
+    font-size: 0.875rem;
+    background-color: #fff;
+}
+
+.admin-input:focus {
+    outline: 2px solid transparent;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+}
+
+.admin-input:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+.admin-table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.admin-table th {
+    color: #6b7280;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: 0;
+}

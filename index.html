@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sastrería Royale - Iniciar Sesión / Registro</title>
+
+    <!-- FontAwesome para los íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#e5c158',
+                            500: '#d4af37',
+                            600: '#aa8c2c',
+                            700: '#856d21',
+                        },
+                        emeraldCustom: {
+                            500: '#0d5c46',
+                            600: '#094736',
+                            700: '#053326',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Enlace a la hoja de estilos personalizada -->
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body class="font-sans antialiased bg-gray-900 min-h-screen text-gray-800 selection:bg-gold-500 selection:text-white">
+
+    <!-- CONTENEDOR PRINCIPAL CON FONDO Y OVERLAY -->
+    <div id="loginView" class="min-h-screen bg-tailor-shop flex items-center justify-center p-4 relative">
+        <!-- Overlay Oscuro sobre la imagen para legibilidad -->
+        <div class="absolute inset-0 bg-overlay"></div>
+
+        <!-- TARJETA DEL FORMULARIO -->
+        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden login-card z-10 transition-all duration-300 transform my-8">
+            
+            <!-- Encabezado Curvo Verde Esmeralda Royale -->
+            <div class="card-header-curved pt-8 pb-7 px-6 text-center text-white relative">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gold-500/20 mb-2 border border-gold-400/40">
+                    <i class="fa-solid fa-scissors text-gold-400 text-xl"></i>
+                </div>
+                <h1 class="font-serif text-2xl font-bold tracking-wide text-white">
+                    Bienvenido a Sastrería Royale
+                </h1>
+                <p class="text-xs text-emerald-100/80 mt-1 uppercase tracking-widest font-medium">Alta Costura & Medida</p>
+            </div>
+
+            <!-- Cuerpos del Formulario -->
+            <div class="p-6 sm:p-8 space-y-5">
+                
+                <!-- Mensaje de Alerta / Error -->
+                <div id="alertBox" class="hidden p-3 text-xs rounded-lg bg-red-50 text-red-600 border border-red-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-exclamation text-red-500 text-sm"></i>
+                    <span id="alertMessage">Por favor completa todos los campos correctamente.</span>
+                </div>
+
+                <!-- ================= FORMULARIO DE INICIO DE SESIÓN ================= -->
+                <div id="login-form-container">
+                    <p class="text-center text-gray-500 text-sm font-medium mb-4">
+                        Inicia sesión en tu cuenta
+                    </p>
+
+                    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                        
+                        <!-- Campo: Correo Electrónico -->
+                        <div>
+                            <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    name="loginEmail"
+                                    required 
+                                    placeholder="Correo electrónico" 
+                                    class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                >
+                                <div class="px-3.5 text-gray-400 border-l border-gray-200">
+                                    <i class="fa-regular fa-envelope"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campo: Contraseña con Toggle de Ojo -->
+                        <div>
+                            <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="loginPassword"
+                                    required 
+                                    placeholder="Contraseña" 
+                                    class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                >
+                                <button 
+                                    type="button" 
+                                    onclick="togglePasswordVisibility('password', 'toggleIcon')" 
+                                    class="px-3.5 text-gray-400 hover:text-gray-600 transition border-l border-gray-200 focus:outline-none"
+                                    title="Mostrar/Ocultar Contraseña"
+                                >
+                                    <i id="toggleIcon" class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox Recordar datos -->
+                        <div class="flex items-center justify-between text-xs text-gray-600 pt-1">
+                            <label class="flex items-center space-x-2 cursor-pointer select-none">
+                                <input type="checkbox" checked class="w-4 h-4 rounded text-emeraldCustom-600 focus:ring-emeraldCustom-500 border-gray-300">
+                                <span>Recordar mis datos</span>
+                            </label>
+                            <a href="#" onclick="showInfoModal('Recuperación de Contraseña', 'Se ha enviado un enlace de restablecimiento a tu correo registrado.')" class="text-emeraldCustom-600 font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <!-- Botón Iniciar Sesión -->
+                        <button 
+                            type="submit" 
+                            id="submitBtn" 
+                            class="w-full py-3.5 px-4 bg-emeraldCustom-600 hover:bg-emeraldCustom-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition transform active:scale-[0.99] flex items-center justify-center space-x-2 group"
+                        >
+                            <span id="btnText" class="flex items-center space-x-2">
+                                <i class="fa-solid fa-right-to-bracket text-gold-400 group-hover:translate-x-0.5 transition-transform"></i>
+                                <span>Iniciar Sesión</span>
+                            </span>
+                            <span id="btnSpinner" class="hidden flex items-center space-x-2">
+                                <i class="fa-solid fa-circle-notch fa-spin text-white"></i>
+                                <span>Validando credenciales...</span>
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Enlace para alternar a Registro -->
+                    <div class="text-center pt-3">
+                        <p class="text-xs text-gray-500">¿No tienes cuenta?</p>
+                        <button type="button" onclick="mostrarRegistro()" class="inline-flex items-center space-x-1.5 text-sm font-bold text-emeraldCustom-600 hover:text-emeraldCustom-700 mt-1 hover:underline">
+                            <i class="fa-solid fa-user-plus text-xs"></i>
+                            <span>Regístrate aquí</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= FORMULARIO DE REGISTRO ================= -->
+                <div id="register-form-container" class="hidden">
+                    <p class="text-center text-gray-500 text-sm font-medium mb-4">
+                        Crea tu nueva cuenta
+                    </p>
+
+                    <form id="registerForm" action="registro.php" method="POST" onsubmit="handleRegister(event)" class="space-y-4">
+                        
+                        <!-- Nombre Completo -->
+                        <div>
+                            <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                                <input 
+                                    type="text" 
+                                    id="regName"
+                                    name="regName"
+                                    placeholder="Nombre completo" 
+                                    required
+                                    class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                >
+                                <div class="px-3.5 text-gray-400 border-l border-gray-200">
+                                    <i class="fa-regular fa-user"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Correo electrónico -->
+                        <div>
+                            <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                                <input 
+                                    type="email" 
+                                    id="regEmail"
+                                    name="regEmail"
+                                    placeholder="Correo electrónico" 
+                                    required
+                                    class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                >
+                                <div class="px-3.5 text-gray-400 border-l border-gray-200">
+                                    <i class="fa-regular fa-envelope"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div>
+                            <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                                <input 
+                                    type="password" 
+                                    id="regPassword"
+                                    name="regPassword"
+                                    placeholder="Crear contraseña" 
+                                    required
+                                    class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                >
+                                <div class="px-3.5 text-gray-400 border-l border-gray-200">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmar Contraseña -->
+                        <div>
+                            <div class="input-group-custom flex items-center border border-gray-300 rounded-lg overflow-hidden bg-gray-50 transition">
+                                <input 
+                                    type="password" 
+                                    id="regConfirmPassword"
+                                    placeholder="Confirmar contraseña" 
+                                    required
+                                    class="w-full px-4 py-3 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+                                >
+                                <div class="px-3.5 text-gray-400 border-l border-gray-200">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de Registro -->
+                        <button 
+                            type="submit" 
+                            class="w-full py-3.5 px-4 bg-emeraldCustom-600 hover:bg-emeraldCustom-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition transform active:scale-[0.99] flex items-center justify-center space-x-2 group"
+                        >
+                            <i class="fa-solid fa-user-check text-gold-400"></i>
+                            <span>Registrarse</span>
+                        </button>
+                    </form>
+
+                    <!-- Enlace para alternar a Login -->
+                    <div class="text-center pt-3">
+                        <p class="text-xs text-gray-500">¿Ya tienes una cuenta?</p>
+                        <button type="button" onclick="mostrarLogin()" class="inline-flex items-center space-x-1.5 text-sm font-bold text-emeraldCustom-600 hover:text-emeraldCustom-700 mt-1 hover:underline">
+                            <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                            <span>Inicia sesión aquí</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sección Inferior de Características -->
+                <div class="pt-4 border-t border-gray-100 grid grid-cols-3 gap-2 text-center">
+                    <div class="p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="showInfoModal('Citas Exclusivas', 'Agenda tu sesión privada con nuestro maestro sastre.')">
+                        <div class="text-emeraldCustom-600 text-lg mb-1">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600 block leading-tight">Citas Exclusivas</span>
+                    </div>
+
+                    <div class="p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="showInfoModal('Trajes a Medida', 'Diseño de trajes Bespoke y confección fina artesanal.')">
+                        <div class="text-emeraldCustom-600 text-lg mb-1">
+                            <i class="fa-solid fa-vest"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600 block leading-tight">Trajes a Medida</span>
+                    </div>
+
+                    <div class="p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer" onclick="showInfoModal('Catálogo Premium', 'Explora nuestras telas italianas e inglesas de lana 150s.')">
+                        <div class="text-emeraldCustom-600 text-lg mb-1">
+                            <i class="fa-solid fa-gem"></i>
+                        </div>
+                        <span class="text-[11px] font-medium text-gray-600 block leading-tight">Catálogo Premium</span>
+                    </div>
+                </div>
+
+                <!-- Footer versión -->
+                <div class="text-center pt-2">
+                    <span class="text-[10px] text-gray-400 flex items-center justify-center space-x-1">
+                        <i class="fa-solid fa-shirt"></i>
+                        <span>Sastrería Royale v1.0 • Sistema Taller</span>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL INFORMATIVO -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform transition-all border border-gray-100 text-center">
+            <div class="w-12 h-12 bg-emerald-50 text-emeraldCustom-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl border border-emerald-100">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="modalTitle" class="font-serif text-lg font-bold text-gray-800 mb-2">Información</h3>
+            <p id="modalBody" class="text-sm text-gray-600 mb-6">Detalle de la acción realizada.</p>
+            <button onclick="closeInfoModal()" class="w-full py-2.5 bg-emeraldCustom-600 hover:bg-emeraldCustom-700 text-white font-semibold rounded-lg text-sm transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT DE FUNCIONALIDAD DEL LOGIN Y REGISTRO -->
+    <script>
+        // Alternar visibilidad de contraseña
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Alternar vista de Login a Registro
+        function mostrarRegistro() {
+            document.getElementById('login-form-container').classList.add('hidden');
+            document.getElementById('register-form-container').classList.remove('hidden');
+            ocultarAlerta();
+        }
+
+        // Alternar vista de Registro a Login
+        function mostrarLogin() {
+            document.getElementById('register-form-container').classList.add('hidden');
+            document.getElementById('login-form-container').classList.remove('hidden');
+            ocultarAlerta();
+        }
+
+        function ocultarAlerta() {
+            document.getElementById('alertBox').classList.add('hidden');
+        }
+
+        function mostrarAlerta(mensaje) {
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.textContent = mensaje;
+            alertBox.classList.remove('hidden');
+        }
+
+        // Procesar Inicio de Sesión
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            ocultarAlerta();
+
+            if (!email || !password) {
+                mostrarAlerta('Por favor completa todos los campos.');
+                return;
+            }
+
+            if (password.length < 4) {
+                mostrarAlerta('La contraseña debe tener al menos 4 caracteres.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnSpinner.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('loginEmail', email);
+            formData.append('loginPassword', password);
+
+            try {
+                const response = await fetch('login.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    sessionStorage.setItem('sisvemUser', JSON.stringify({
+                        nombre: data.nombre,
+                        email: data.email,
+                        rol: data.rol,
+                        csrfToken: data.csrfToken
+                    }));
+                    window.location.href = data.rol === 'administrador_general'
+                        ? 'administrador_general.html'
+                        : 'principal.html';
+                    return;
+                }
+
+                mostrarAlerta(data.message || 'Correo o contraseña incorrectos.');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Ocurrió un error al conectar con el servidor.');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnSpinner.classList.add('hidden');
+            }
+        }
+
+        // Procesar Registro
+        async function handleRegister(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+    ocultarAlerta();
+
+    if (!name || !email || !password || !confirmPassword) {
+        mostrarAlerta('Por favor completa todos los campos del registro.');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        mostrarAlerta('Las contraseñas no coinciden.');
+        return;
+    }
+
+    if (password.length < 6) {
+        mostrarAlerta('La contraseña debe tener al menos 6 caracteres.');
+        return;
+    }
+
+    // Preparar los datos a enviar
+    const formData = new FormData();
+    formData.append('regName', name);
+    formData.append('regEmail', email);
+    formData.append('regPassword', password);
+
+    try {
+        // Enviar la petición AJAX a tu archivo PHP
+        const response = await fetch('registro.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            // Mostrar mensaje exitoso o redirigir directamente
+            window.location.href = "principal.html";
+        } else {
+            // Mostrar el mensaje de error que devuelve el PHP
+            mostrarAlerta(data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarAlerta('Ocurrió un error al conectar con el servidor.');
+    }
+}
+
+        // Modal Informativo
+        function showInfoModal(title, message) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').textContent = message;
+            document.getElementById('infoModal').classList.remove('hidden');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
